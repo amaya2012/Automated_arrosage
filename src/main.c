@@ -1,54 +1,50 @@
-
-/* Projet arrosage automatique
-- L'appli se connecte chaque jour à https://script.google.com/macros/s/AKfycbyzgNwg63VFdDYp4PzsluVC8VzzaFRrWnox_JyVtAUKl7SBMUQMz2siVh_RkDXO6ol_/exec?duration=15&eau_detect=1&comment=lastDays_2_lastHours_10
-- Marco retourne: le code "Idx,Nb jour,Heure départ,durée (s),tempo durée,;1,3,18,10," au format JSON
-- Récuperation de la la durée pour actionner une pompe d’arrosage via un relai.
-- Un capteur sécurité d’eau est présent pour empêcher l’arrosage si l’eau manque.  */
-
 #include "Wire.h"
 #include <Arduino.h>
+#include <WiFi.h>
+#include <HTTPClient.h>
 
-#define PIN_SECURE 23
-#define PIN_POMPE 19
-#define LED_BUILTIN 2  // la LED intégrée 
+#define DUREE 10
 
-//initialiser les pin
-//Verifie l'heure qu'il est, s'il est l'heure on s'allume
-//Vérifie capteur securité d'eau
-//On recupère temps d'arrosage
-//Active le temps ecessaire
-//Veille
+#define PIN_SECURE 23  // Pin pour la détection d'eau
+#define PIN_POMPE 19   // Pin pour l'activation de la pompe
+#define LED_BUILTIN 2  // LED intégrée
+
+int flag = 1; // Variable pour éviter des activations multiples
 
 // Fonction pour vérifier le capteur de sécurité d'eau
 bool isWaterAvailable() {
-  // Lecture de l'état du capteur
-  int buttonState = digitalRead(PIN_SECURE);
-
-  // Si le capteur détecte un manque d'eau (état LOW), retourner false
-  return buttonState == HIGH;
+  int buttonState = digitalRead(PIN_SECURE); // Lecture de l'état du capteur
+  return buttonState == HIGH; // Si HIGH, l'eau est disponible
 }
 
-
+// Fonction pour activer la pompe
+void activatePump(int t) {
+  digitalWrite(LED_BUILTIN, HIGH); // Active la pompe
+  delay(1000 * t);              // Attente de t secondes
+  digitalWrite(LED_BUILTIN, LOW); // Arrête la pompe
+}
 
 void setup() {
-  // put your setup code here
-  Serial.begin(115200);                  // Initialisation de la communication série
+  Serial.begin(115200);              // Initialisation de la communication série
   pinMode(PIN_SECURE, INPUT_PULLUP); // Configure GPIO23 en entrée avec résistance pull-up interne
-  pinMode(PIN_POMPE, OUTPUT); // Configure GPIO19 en en sortie
-  pinMode(LED_BUILTIN, OUTPUT);          // Configure la LED intégrée en sortie
+  pinMode(PIN_POMPE, OUTPUT);        // Configure GPIO19 en sortie
+  pinMode(LED_BUILTIN, OUTPUT);      // Configure la LED intégrée en sortie
 
   Serial.println("Initialisation du système...");
-
 }
 
 void loop() {
-
   // Vérifier le capteur de sécurité
-  if (isWaterAvailable()) {
-    digitalWrite(LED_BUILTIN, HIGH); // Allume la LED pour indiquer que l'eau est disponible
-    Serial.println("L'eau est disponible. Prêt à arroser !");
-  } else {
-    digitalWrite(LED_BUILTIN, LOW); // Éteint la LED si l'eau manque
+  if (isWaterAvailable()) { 
+    if(flag){
+      Serial.println("Activation de la pompe...");
+      activatePump(DUREE);
+      flag=0;
+    }
+    Serial.println("Déja arrosé. Mise en veille....");
+
+  } else { //
     Serial.println("Pas d'eau disponible. Attente...");
   }
+  delay(1000); // Petit délai pour éviter de surcharger le processeur
 }
