@@ -10,6 +10,7 @@
 
 #define PIN_SECURE 23
 #define PIN_POMPE 19
+#define LED_BUILTIN 2  // la LED intégrée 
 
 //initialiser les pin
 //Verifie l'heure qu'il est, s'il est l'heure on s'allume
@@ -18,20 +19,36 @@
 //Active le temps ecessaire
 //Veille
 
-// put function declarations here:
-int myFunction(int, int);
+// Fonction pour vérifier le capteur de sécurité d'eau
+bool isWaterAvailable() {
+  // Lecture de l'état du capteur
+  int buttonState = digitalRead(PIN_SECURE);
+
+  // Si le capteur détecte un manque d'eau (état LOW), retourner false
+  return buttonState == HIGH;
+}
+
+
 
 void setup() {
   // put your setup code here
-  pinMode(PIN_SECURE, INPUT_PULLUP); // Configure GPIO23 en entrée avec résistance pull-down interne
+  Serial.begin(115200);                  // Initialisation de la communication série
+  pinMode(PIN_SECURE, INPUT_PULLUP); // Configure GPIO23 en entrée avec résistance pull-up interne
   pinMode(PIN_POMPE, OUTPUT); // Configure GPIO19 en en sortie
+  pinMode(LED_BUILTIN, OUTPUT);          // Configure la LED intégrée en sortie
+
+  Serial.println("Initialisation du système...");
+
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-}
 
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
+  // Vérifier le capteur de sécurité
+  if (isWaterAvailable()) {
+    digitalWrite(LED_BUILTIN, HIGH); // Allume la LED pour indiquer que l'eau est disponible
+    Serial.println("L'eau est disponible. Prêt à arroser !");
+  } else {
+    digitalWrite(LED_BUILTIN, LOW); // Éteint la LED si l'eau manque
+    Serial.println("Pas d'eau disponible. Attente...");
+  }
 }
