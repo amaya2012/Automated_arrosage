@@ -8,6 +8,9 @@
 #include "Wire.h"
 #include <Arduino.h>
 
+#define PIN_SECURE 23
+#define PIN_POMPE 19
+
 //initialiser les pin
 //Verifie l'heure qu'il est, s'il est l'heure on s'allume
 //Vérifie capteur securité d'eau
@@ -19,8 +22,9 @@
 int myFunction(int, int);
 
 void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+  // put your setup code here
+  pinMode(PIN_SECURE, INPUT_PULLUP); // Configure GPIO23 en entrée avec résistance pull-down interne
+  pinMode(PIN_POMPE, OUTPUT); // Configure GPIO19 en en sortie
 }
 
 void loop() {
