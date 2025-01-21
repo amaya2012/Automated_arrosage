@@ -8,14 +8,12 @@
 #include "Wire.h"
 #include <Arduino.h>
 
-
 //initialiser les pin
 //Verifie l'heure qu'il est, s'il est l'heure on s'allume
 //Vérifie capteur securité d'eau
 //On recupère temps d'arrosage
 //Active le temps ecessaire
 //Veille
-
 
 // put function declarations here:
 int myFunction(int, int);
