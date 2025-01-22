@@ -3,13 +3,13 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
 
-#define DUREE 10
+#define DUREE_ARROSAGE 10
+#define DURRE_VEILLE 60 * 1000000
 
 #define PIN_SECURE 23  // Pin pour la détection d'eau
 #define PIN_RELAIS 19   // Pin pour l'activation de la pompe
 #define LED_BUILTIN 2  // LED intégrée
 
-int flag = 1; // Variable pour éviter des activations multiples
 const char* ssid = "fbx_buceo";
 const char* password = "1970C1998A";
 
@@ -26,6 +26,7 @@ void activatePump(int t) {
   delay(1000 * t);              // Attente de t secondes
   digitalWrite(LED_BUILTIN, LOW); // Arrête la pompe
   //digitalWrite(PIN_RELAIS, LOW); // Arrête la pompe
+
 }
 
 void connectWifi(){
@@ -53,6 +54,7 @@ void setup() {
   pinMode(LED_BUILTIN, OUTPUT);      // Configure la LED intégrée en sortie
   Serial.println("Initialisation du système...");
 
+
   // Initialisation du WIFI
   connectWifi();
 }
@@ -60,12 +62,14 @@ void setup() {
 void loop() {
   // Vérifier le capteur de sécurité
   if (isWaterAvailable()) { 
-    if(flag){
-      Serial.println("Activation de la pompe...");
-      activatePump(DUREE);
-      flag=0;
-    }
-    Serial.println("Déja arrosé. Mise en veille....");
+
+    Serial.println("Activation de la pompe...");
+    activatePump(DUREE_ARROSAGE);
+    Serial.println("Arrosage terminé...");
+    delay(100);
+    Serial.println("Passage en veille pour 1 minute...");
+    esp_deep_sleep(DURRE_VEILLE); // Veille pendant DURRE_VEILLE secondes (1 minute)
+    
 
   } else { //
     Serial.println("Pas d'eau disponible. Attente...");
