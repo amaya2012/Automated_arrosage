@@ -15,7 +15,7 @@ This project aims to create an automated irrigation system with the following re
 ## Circuit Diagram
 Below is the schematic diagram of the system:
 
-![Circuit Diagram](lib/image.png)
+<img src="lib/circuit.png" alt="Circuit Diagram" width="600">
 
 ## Features
 - Monitor water level to prevent dry periods.
@@ -39,9 +39,6 @@ Below is the schematic diagram of the system:
 - Integration with weather forecast APIs to adjust watering based on real-time weather conditions.
 - Web or mobile interface to monitor system status and adjust settings.
 - Add multiple sensors for more advanced monitoring (soil moisture, pH levels, etc.).
-
-## License
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgements
 - ESP32: https://www.espressif.com/en/products/hardware/esp32/overview
